@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "genlayer-js": "1.1.8"
+  },
+  "private": true,
+  "scripts": {
+    "test": "python3 -m unittest discover -s tests",
+    "verify": "node run.mjs"
+  },
+  "name": "handoffmatrix-genlayer"
+}

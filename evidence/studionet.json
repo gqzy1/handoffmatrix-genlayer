@@ -1,0 +1,80 @@
+{
+  "chainId": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "sourceSha256": "ed3e9021a095f7625ad75466d926ed0e7ab6bb6f8d7a770aaec9b414e178f14b",
+  "transactions": {
+    "deploy": {
+      "hash": "0x6d4ef9ffe82c9c2435bf301fd74938d5ebf52287cf81120bc063a0dc07be8b0f",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS",
+        "expectedError": null
+      }
+    },
+    "first_revision": {
+      "hash": "0x029d1f558f256db712f6ed7979950bde1f1be43841825da501ac735169eb1c4f",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS",
+        "expectedError": null
+      }
+    },
+    "skip_revision": {
+      "hash": "0x73c14a7a1a7a99a8b3a5ebc82dc65d34faebd6bab7963e2d2f36adf20a3c9817",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "ERROR",
+        "expectedError": "NO_OPEN_REVISION"
+      }
+    },
+    "corrected_revision": {
+      "hash": "0x7fb46bd39e2ddd855557e4614f029c64b0c48e21019941bca9a7d28b2ba888f8",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS",
+        "expectedError": null
+      }
+    },
+    "duplicate": {
+      "hash": "0xa99760b4183326a513077f31f79ec2da129c0506a755f8b1c86915d4672a9f48",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "ERROR",
+        "expectedError": "REVISION_EXISTS"
+      }
+    }
+  },
+  "state": {
+    "revision_one": {
+      "evidence": {
+        "action": "Switch the packing station label printer to Printer B",
+        "rollback": "",
+        "verification": ""
+      },
+      "missing": [
+        "verification",
+        "rollback"
+      ],
+      "note": "Switch the packing station label printer to Printer B.",
+      "status": "NEEDS_WORK"
+    },
+    "revision_two": {
+      "evidence": {
+        "action": "Switch the packing station label printer to Printer B.",
+        "rollback": "switch the packing station label printer back to Printer A.",
+        "verification": "verify that its barcode scans as TEST-001."
+      },
+      "missing": [],
+      "note": "Switch the packing station label printer to Printer B. Print a test label and verify that its barcode scans as TEST-001. To roll back, switch the packing station label printer back to Printer A.",
+      "status": "READY"
+    },
+    "no_revision_three": null
+  },
+  "signer": "0xDA861dCf5dd182403EdB6cB81b79d0B4db6ee03c",
+  "address": "0x1A4e879B6a97D51937403f0c460e6156D58A7e20"
+}
