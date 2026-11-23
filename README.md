@@ -1,20 +1,21 @@
 # HandoffMatrix
 
-[Stable Studionet contract](https://explorer-studio.genlayer.com/address/0x1A4e879B6a97D51937403f0c460e6156D58A7e20)
+HandoffMatrix gives operations teams a wallet-bound handoff record. It checks whether a note describes what to do, how to verify the result, and how to roll back. The designated recipient can acknowledge the reviewed revision.
 
-A revision ledger for operations teams that need handoffs to state what to do, how to confirm it worked, and how to roll back. It turns a textual note into a three-column evidence matrix and gives the next operator a stable record to inspect.
+[Stable Studionet deployment](https://explorer-studio.genlayer.com/address/0x39Cf0ae4Ee56C9C7E1d5456462528952Ab58Fb66) · [Finalized transaction evidence](evidence/studionet-v2.json)
 
 ## Protocol
 
-1. The submitting wallet calls `evaluate(ticket, 1, note)`. The leader supplies verbatim evidence for an action and target, an observable verification with an expected result, and a rollback action and target.
-2. A validator independently extracts evidence from the identical note. It checks agreement on missing fields and requires each proposed quote to match the same evidence span by containment. Differences in quote boundaries can pass, while a conflicting span or missing classification is rejected. This is an application equivalence rule over meaning-bearing evidence, with deterministic storage.
-3. The contract records `NEEDS_WORK` and names each missing field, or records `READY` and closes the ticket to revisions. A correction must follow the previous revision, which remains immutable. `revision(operator, ticket, number)` returns JSON or an empty string.
+1. The operator calls `create(ticket, recipient)` to bind a distinct recipient wallet. The task starts at `NEEDS_WORK`, version 0.
+2. The operator calls `evaluate(ticket, revision, note)` with the next consecutive revision. The leader extracts verbatim evidence for the action and target, an observable verification with an expected result, and a rollback action and target.
+3. Validators extract independently from the same note. They compare the missing-field decisions and the evidence spans. A quote must appear in the note and one span must contain the other. Inconsistent evidence is rejected. A complete matrix advances the task to `READY` and freezes the reviewed revision.
+4. The recipient calls `acknowledge(operator, ticket, expected_revision)` to acknowledge the exact ready revision. That moves the task to `ACKNOWLEDGED`. Early, unauthorized, stale and repeat acknowledgements are rejected. Historical revisions remain immutable.
 
-Use fictional or publishable notes. Notes and excerpts are public. READY describes documented coverage, and the record does not establish that the work occurred or that the operations are appropriate for a particular environment.
+Use `task(operator, ticket)` to read the recipient, latest version and current status. Use `revision(operator, ticket, number)` for the immutable note, evidence and assessment from that revision. Missing records return an empty string. [Exact SDK calls](scenario.mjs)
 
-## Example
+## Meaning and limits
 
-The Studionet scenario submits a label-printer change with neither a verification procedure nor rollback, rejects a skipped revision, and then accepts a correction with both. See [scenario.mjs](scenario.mjs) for exact SDK calls.
+`READY` means the three documentation requirements were found by consensus. `ACKNOWLEDGED` records acknowledgement by the designated wallet. Operational execution and safety must be checked outside the contract. Notes and excerpts are public. Consensus can disagree, and a model can misinterpret ambiguous or adversarial prose. The validator checks independent semantic agreement and verbatim spans, while the acknowledgement is a deterministic wallet authorization. Tickets permit up to 20 revisions and have no recipient reassignment or reopen path.
 
 ## Reproduce
 
@@ -23,10 +24,14 @@ npm ci
 npm test
 python3 -m pip install -r requirements-lint.txt
 genvm-lint check contracts/handoffmatrix.py --json
-sha256sum -c evidence/source.sha256
+sha256sum -c evidence/source-v2.sha256
 npm run verify
 ```
 
-The verifier targets Stable Studionet 61999 only. It checks source parity, transaction finality and execution, expected rejections, and latest-final readbacks. [Official lint output](evidence/genvm-lint.json) · [Studionet evidence](evidence/studionet.json)
+Verification targets Stable Studionet 61999. It checks byte-for-byte source parity, finalized receipts and signers, expected rejections, immutable revisions and the current acknowledged state. Intermediate task states are snapshots from the original run. [Official lint output](evidence/genvm-lint-v2.json)
 
-To record a fresh run, run `node run.mjs --write /tmp/your-test.keys.json` from a clean checkout without the published Studionet evidence file. Use a dedicated test signer. The checkpoint is private and must stay outside the repository.
+To record a fresh run, use a clean checkout without the published v2 evidence file and run `node run.mjs --write /tmp/your-test.keys.json`. The runner generates two independent test wallets. Keep that checkpoint private and outside the repository.
+
+## Deployment history
+
+The [original contract](https://explorer-studio.genlayer.com/address/0x1A4e879B6a97D51937403f0c460e6156D58A7e20) stopped at document readiness. Its source and verifier are available at [the pinned first release](https://github.com/gqzy1/handoffmatrix-genlayer/tree/19e20d8e2a83304b2391b94d5779f22dd14f50d1). [Original receipts and evidence](evidence/studionet.json)

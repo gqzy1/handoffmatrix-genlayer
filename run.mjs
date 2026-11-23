@@ -10,7 +10,7 @@ const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 const chain = { ...studionet, rpcUrls: { default: { http: ['https://studio.genlayer.com/api'] } } };
 const reader = createClient({ chain });
 const source = fs.readFileSync(sourceFile, 'utf8');
-const file = 'evidence/studionet.json';
+const file = 'evidence/studionet-v2.json';
 const write = process.argv[2] === '--write';
 const keyFile = process.argv[3];
 const digest = sha256(source);
@@ -19,16 +19,19 @@ const log = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file)) :
 assert.equal(log.sourceSha256, digest);
 assert.equal(await reader.getChainId(), 61999);
 const save = () => fs.writeFileSync(file, JSON.stringify(log, null, 2) + '\n');
-let client;
+const clients = {};
 if (write) {
   assert.ok(keyFile && keyFile.startsWith('/tmp/') && keyFile.endsWith('.keys.json'), 'use an absolute /tmp/*.keys.json checkpoint');
-  if (!fs.existsSync(keyFile)) fs.writeFileSync(keyFile, generatePrivateKey(), { mode: 0o600, flag: 'wx' });
-  const account = createAccount(fs.readFileSync(keyFile, 'utf8'));
-  client = createClient({ chain, account });
-  log.signer ??= account.address;
-  assert.equal(log.signer, account.address);
+  if (!fs.existsSync(keyFile)) fs.writeFileSync(keyFile, JSON.stringify({ operator: generatePrivateKey(), recipient: generatePrivateKey() }), { mode: 0o600, flag: 'wx' });
+  const keys = JSON.parse(fs.readFileSync(keyFile, 'utf8'));
+  for (const role of ['operator', 'recipient']) {
+    const account = createAccount(keys[role]);
+    clients[role] = createClient({ chain, account });
+    log[role] ??= account.address;
+    assert.equal(log[role], account.address);
+  }
 }
-async function transaction(label, expectedError, send) {
+async function transaction(label, expectedError, send, role = 'operator') {
   let entry = log.transactions[label];
   if (!entry) {
     assert.ok(write, 'missing transaction ' + label);
@@ -39,6 +42,7 @@ async function transaction(label, expectedError, send) {
   const tx = await reader.waitForTransactionReceipt({
     hash: entry.hash, status: 'FINALIZED', interval: 4500, retries: 120, fullTransaction: true,
   });
+  assert.equal((tx.from_address ?? tx.sender).toLowerCase(), log[role].toLowerCase());
   let leader = tx.consensus_data?.leader_receipt;
   if (Array.isArray(leader)) leader = leader.find((row) => row.mode === 'leader');
   assert.ok([7, 'FINALIZED'].includes(tx.status));
@@ -55,22 +59,27 @@ async function transaction(label, expectedError, send) {
   return tx;
 }
 
-const deployment = await transaction('deploy', null, () => client.deployContract({ code: source, args: [], value: 0n, leaderOnly: false }));
+const deployment = await transaction('deploy', null, () => clients.operator.deployContract({ code: source, args: [], value: 0n, leaderOnly: false }));
 const address = deployment.data?.contract_address ?? deployment.contract_address;
 assert.ok(/^0x[0-9a-f]{40}$/i.test(address));
 if (write) { log.address = address; save(); }
 else assert.equal(log.address, address);
 assert.equal(await reader.getContractCode(address), source);
-const call = (label, method, args, error = null) => transaction(label, error, async () => {
+const call = (label, method, args, error = null, role = 'operator') => transaction(label, error, async () => {
   await delay(3500);
-  return client.writeContract({ address, functionName: method, args, value: 0n, leaderOnly: false });
-});
-async function read(label, functionName, args) {
+  return clients[role].writeContract({ address, functionName: method, args, value: 0n, leaderOnly: false });
+}, role);
+async function read(label, functionName, args, snapshot = false) {
+  if (!write && snapshot) {
+    assert.ok(Object.hasOwn(log.state, label), 'missing historical snapshot: ' + label);
+    return log.state[label];
+  }
   const raw = await reader.readContract({ address, functionName, args, transactionHashVariant: 'latest-final' });
   const value = raw ? JSON.parse(raw) : null;
   if (write) { log.state[label] = value; save(); }
   else assert.deepEqual(log.state[label], value);
   return value;
 }
-await exercise({ signer: log.signer, call, read });
+assert.notEqual(log.operator.toLowerCase(), log.recipient.toLowerCase());
+await exercise({ operator: log.operator, recipient: log.recipient, call, read });
 console.log('Verified source parity, finalized receipts and finalized readbacks for', address);

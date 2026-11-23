@@ -1,0 +1,173 @@
+{
+  "chainId": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "sourceSha256": "3cf3e0d8f3b846b714138f7408f78a17348605c39ea6a42b79df2882c3d3be6d",
+  "transactions": {
+    "deploy": {
+      "hash": "0xa7b579cfbb5817f458fdc0693160b17ad107827d7958595ff185c71d018b9c45",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS",
+        "expectedError": null
+      }
+    },
+    "create": {
+      "hash": "0x321fb767a420f4cb29c64df4025a637888eb9c8755203e73aa6ab1238cca08dc",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS",
+        "expectedError": null
+      }
+    },
+    "first_revision": {
+      "hash": "0x9ebbcb8b11d91c568ae2ec7aa4f166a2e316e1fbd2b780805f26cd63f8ddea43",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS",
+        "expectedError": null
+      }
+    },
+    "early_ack": {
+      "hash": "0xba3f3253e2afb8440db7a632392f24adf99f7cc19221dbd374f7e2adfc4bc3dd",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "ERROR",
+        "expectedError": "NOT_READY"
+      }
+    },
+    "skip_revision": {
+      "hash": "0xe89063451f4b75e24e937b24d0cfab8f472635dbe11a892792a844ac530b85cd",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "ERROR",
+        "expectedError": "INVALID_SEQUENCE"
+      }
+    },
+    "overwrite": {
+      "hash": "0x4ccae8f7f32b48fa827cc345b8e713434e75dd35c8d19add397cb3974680b590",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "ERROR",
+        "expectedError": "REVISION_EXISTS"
+      }
+    },
+    "corrected_revision": {
+      "hash": "0x1e9d8defa8ec35c66fb1dd21118791acdde3ef80007b62ba663e50287075ea73",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS",
+        "expectedError": null
+      }
+    },
+    "unauthorized_ack": {
+      "hash": "0x1bd1ff05f820719b0c4d7b4a4074406d94c7a048ff2a85336e24944b3b10beab",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "ERROR",
+        "expectedError": "NOT_RECIPIENT"
+      }
+    },
+    "acknowledge": {
+      "hash": "0xaa3b69cbbb28bb1669423f4fdffde17fb22fe96175d57744677e7be64ad25e6c",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "SUCCESS",
+        "expectedError": null
+      }
+    },
+    "duplicate_ack": {
+      "hash": "0xdef7fa5c213455f1b5db2194312feda9b42a7bd3cb0108161cedca9c0b0bafd0",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "ERROR",
+        "expectedError": "ALREADY_ACKNOWLEDGED"
+      }
+    },
+    "modify_closed": {
+      "hash": "0xd6d942098ce7357ace40ab8955967d04598ab3833d876244a0db43711dabecc4",
+      "receipt": {
+        "status": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "execution": "ERROR",
+        "expectedError": "NO_OPEN_REVISION"
+      }
+    }
+  },
+  "state": {
+    "revision_one": {
+      "evidence": {
+        "action": "Switch the packing station label printer to Printer B",
+        "rollback": "",
+        "verification": ""
+      },
+      "missing": [
+        "verification",
+        "rollback"
+      ],
+      "note": "Switch the packing station label printer to Printer B.",
+      "status": "NEEDS_WORK"
+    },
+    "needs_work": {
+      "recipient": "0x5521a2bbdbe48d9a678d830da2aab06495e5cce3",
+      "version": 1,
+      "status": "NEEDS_WORK"
+    },
+    "revision_two": {
+      "evidence": {
+        "action": "Switch the packing station label printer to Printer B.",
+        "rollback": "switch the packing station label printer back to Printer A.",
+        "verification": "verify that its barcode scans as TEST-001."
+      },
+      "missing": [],
+      "note": "Switch the packing station label printer to Printer B. Print a test label and verify that its barcode scans as TEST-001. To roll back, switch the packing station label printer back to Printer A.",
+      "status": "READY"
+    },
+    "ready": {
+      "recipient": "0x5521a2bbdbe48d9a678d830da2aab06495e5cce3",
+      "version": 2,
+      "status": "READY"
+    },
+    "acknowledged": {
+      "recipient": "0x5521a2bbdbe48d9a678d830da2aab06495e5cce3",
+      "version": 2,
+      "status": "ACKNOWLEDGED"
+    },
+    "retained_revision_one": {
+      "evidence": {
+        "action": "Switch the packing station label printer to Printer B",
+        "rollback": "",
+        "verification": ""
+      },
+      "missing": [
+        "verification",
+        "rollback"
+      ],
+      "note": "Switch the packing station label printer to Printer B.",
+      "status": "NEEDS_WORK"
+    },
+    "retained_revision_two": {
+      "evidence": {
+        "action": "Switch the packing station label printer to Printer B.",
+        "rollback": "switch the packing station label printer back to Printer A.",
+        "verification": "verify that its barcode scans as TEST-001."
+      },
+      "missing": [],
+      "note": "Switch the packing station label printer to Printer B. Print a test label and verify that its barcode scans as TEST-001. To roll back, switch the packing station label printer back to Printer A.",
+      "status": "READY"
+    },
+    "no_revision_three": null
+  },
+  "operator": "0xb403820780653a8B3B056ee2652F86200DBD7aF2",
+  "recipient": "0x5521a2BBDbE48d9A678D830DA2AaB06495E5Cce3",
+  "address": "0x39Cf0ae4Ee56C9C7E1d5456462528952Ab58Fb66"
+}
